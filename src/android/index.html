@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Monitor de Sensores</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+    th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+    th { background-color: #4CAF50; color: white; }
+  </style>
+</head>
+<body>
+  <h1> Monitor de Sensores</h1>
+  <button onclick="cargarDatos()"> Cargar última medición</button>
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Sensor</th>
+        <th>Valor</th>
+        <th>Timestamp</th>
+      </tr>
+    </thead>
+    <tbody id="tabla-mediciones"></tbody>
+  </table>
+
+  <script>
+    async function cargarDatos() {
+      const response = await fetch("http://localhost:3000/db/Sprint0"); 
+      const datos = await response.json();
+      const tbody = document.getElementById("tabla-mediciones");
+      tbody.innerHTML = "";
+      datos.forEach(med => {
+        const fila = `
+          <tr>
+            <td>${med.id}</td>
+            <td>${med.sensorId}</td>
+            <td>${med.valor}</td>
+            <td>${med.timestamp}</td>
+          </tr>
+        `;
+        tbody.innerHTML += fila;
+      });
+    }
+
+    // cargar al iniciar
+    cargarDatos();
+  </script>
+</body>
+</html>
