@@ -48,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
 
         this.callbackDelEscaneo = new ScanCallback() {
             @Override
+
             public void onScanResult( int callbackType, ScanResult resultado ) {
                 super.onScanResult(callbackType, resultado);
                 Log.d(ETIQUETA_LOG, " buscarTodosLosDispositivosBTL(): onScanResult() ");
@@ -80,6 +81,7 @@ public class MainActivity extends AppCompatActivity {
     } // ()
 
     // --------------------------------------------------------------
+    //posible cambio de nombre
     // --------------------------------------------------------------
     private void mostrarInformacionDispositivoBTLE( ScanResult resultado ) {
 
