@@ -27,7 +27,7 @@
 
   <script>
     async function cargarDatos() {
-      const response = await fetch("http://localhost:3000/db/Sprint0"); 
+      const response = await fetch("http://localhost:3000/"); 
       const datos = await response.json();
       const tbody = document.getElementById("tabla-mediciones");
       tbody.innerHTML = "";
