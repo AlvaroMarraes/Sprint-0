@@ -19,6 +19,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 // ------------------------------------------------------------------
@@ -148,24 +149,31 @@ public class MainActivity extends AppCompatActivity {
             public void onScanResult(int callbackType, ScanResult resultado) {
                 super.onScanResult(callbackType, resultado);
 
-                BluetoothDevice device = resultado.getDevice();
-                if (device.getName() != null && device.getName().equals("Alvaro")) {
-                    Log.d(ETIQUETA_LOG, "¡¡ Encontrado beacon buscado !!");
+                try {
+                    BluetoothDevice device = resultado.getDevice();
+                    if (device.getName() != null && device.getName().equals("Alvaro")) {
+                        Log.d(ETIQUETA_LOG, "¡¡ Encontrado beacon buscado !!");
 
-                    // Sacar manufacturer data
-                    byte[] manufacturerData = null;
-                    if (resultado.getScanRecord() != null &&
-                            resultado.getScanRecord().getManufacturerSpecificData() != null &&
-                            resultado.getScanRecord().getManufacturerSpecificData().size() > 0) {
+                        // Sacar manufacturer data
+                        byte[] manufacturerData = null;
+                        if (resultado.getScanRecord() != null &&
+                                resultado.getScanRecord().getManufacturerSpecificData() != null &&
+                                resultado.getScanRecord().getManufacturerSpecificData().size() > 0) {
 
-                        manufacturerData = resultado.getScanRecord()
-                                .getManufacturerSpecificData()
-                                .valueAt(0); // primer bloque
+                            manufacturerData = resultado.getScanRecord()
+                                    .getManufacturerSpecificData()
+                                    .valueAt(0); // primer bloque
+                        }
+
+                        interpretarMedicion(manufacturerData);
                     }
-
-                    interpretarMedicion(manufacturerData);
+                } catch (SecurityException e) {
+                    Log.e(ETIQUETA_LOG, "No tienes permisos suficientes para acceder a Bluetooth", e);
+                } catch (Exception e) {
+                    Log.e(ETIQUETA_LOG, "Error procesando el scan result", e);
                 }
             }
+
 
             @Override
             public void onBatchScanResults(List<ScanResult> results) {
@@ -312,9 +320,13 @@ public class MainActivity extends AppCompatActivity {
         Log.d(ETIQUETA_LOG, " === MEDICIÓN RECIBIDA ===");
         Log.d(ETIQUETA_LOG, " Tipo: " + tipoMedicion);
         Log.d(ETIQUETA_LOG, " Valor: " + valor);
+
+        // Enviar la medición al servidor REST
+        Logica logica = new Logica("https://amarare.upv.edu.es/medicion");
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            logica.guardarMedicion(id, valor, Instant.now().toString());
+        }
     }
-
-
 
     // --------------------------------------------------------------
     // --------------------------------------------------------------
