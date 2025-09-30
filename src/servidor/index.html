@@ -27,7 +27,7 @@
 
   <script>
     async function cargarDatos() {
-      const response = await fetch("http://localhost:3000/"); 
+      const response = await fetch("/api/medicion/1");
       const datos = await response.json();
       const tbody = document.getElementById("tabla-mediciones");
       tbody.innerHTML = "";
