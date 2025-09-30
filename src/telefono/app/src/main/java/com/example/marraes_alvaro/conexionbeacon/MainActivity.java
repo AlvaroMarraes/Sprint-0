@@ -143,12 +143,28 @@ public class MainActivity extends AppCompatActivity {
         Log.d(ETIQUETA_LOG, "  buscarEsteDispositivoBTLE(): instalamos scan callback ");
         // super.onScanResult(ScanSettings.SCAN_MODE_LOW_LATENCY, result); para ahorro de energía
         this.callbackDelEscaneo = new ScanCallback() {
-            @Override
-            public void onScanResult( int callbackType, ScanResult resultado ) {
-                super.onScanResult(callbackType, resultado);
-                Log.d(ETIQUETA_LOG, "  buscarEsteDispositivoBTLE(): onScanResult() ");
 
-                mostrarInformacionDispositivoBTLE( resultado );
+            @Override
+            public void onScanResult(int callbackType, ScanResult resultado) {
+                super.onScanResult(callbackType, resultado);
+
+                BluetoothDevice device = resultado.getDevice();
+                if (device.getName() != null && device.getName().equals("Alvaro")) {
+                    Log.d(ETIQUETA_LOG, "¡¡ Encontrado beacon buscado !!");
+
+                    // Sacar manufacturer data
+                    byte[] manufacturerData = null;
+                    if (resultado.getScanRecord() != null &&
+                            resultado.getScanRecord().getManufacturerSpecificData() != null &&
+                            resultado.getScanRecord().getManufacturerSpecificData().size() > 0) {
+
+                        manufacturerData = resultado.getScanRecord()
+                                .getManufacturerSpecificData()
+                                .valueAt(0); // primer bloque
+                    }
+
+                    interpretarMedicion(manufacturerData);
+                }
             }
 
             @Override
@@ -268,6 +284,36 @@ public class MainActivity extends AppCompatActivity {
 
         }
     } // ()
+
+    private void interpretarMedicion(byte[] datos) {
+        if (datos == null || datos.length < 3) {
+            Log.d(ETIQUETA_LOG, "interpretarMedicion(): trama demasiado corta");
+            return;
+        }
+
+        int id = datos[0] & 0xFF;
+        int valor = ((datos[1] & 0xFF) << 8) | (datos[2] & 0xFF);
+
+        String tipoMedicion;
+        switch (id) {
+            case 11:
+                tipoMedicion = "CO₂ (ppm)";
+                break;
+            case 12:
+                tipoMedicion = "Temperatura (ºC)";
+                break;
+            case 13:
+                tipoMedicion = "Ruido (dB)";
+                break;
+            default:
+                tipoMedicion = "Desconocido";
+        }
+
+        Log.d(ETIQUETA_LOG, " === MEDICIÓN RECIBIDA ===");
+        Log.d(ETIQUETA_LOG, " Tipo: " + tipoMedicion);
+        Log.d(ETIQUETA_LOG, " Valor: " + valor);
+    }
+
 
 
     // --------------------------------------------------------------

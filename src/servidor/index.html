@@ -4,48 +4,61 @@
   <meta charset="UTF-8">
   <title>Monitor de Sensores</title>
   <style>
-    body { font-family: Arial, sans-serif; padding: 20px; }
-    table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+    body { font-family: Arial, sans-serif; padding: 20px; background-color: #f5f5f5; }
+    h1 { color: #333; }
+    button { background-color: #4CAF50; color: white; border: none; padding: 8px 16px; cursor: pointer; margin-top: 10px; border-radius: 4px; }
+    button:hover { background-color: #45a049; }
+    table { border-collapse: collapse; width: 100%; margin-top: 20px; background-color: white; border-radius: 6px; overflow: hidden; box-shadow: 0 0 5px rgba(0,0,0,0.1); }
     th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
     th { background-color: #4CAF50; color: white; }
   </style>
 </head>
 <body>
-  <h1> Monitor de Sensores</h1>
-  <button onclick="cargarDatos()"> Cargar última medición</button>
+  <h1>Monitor de Sensores</h1>
+  <button onclick="cargarUltima()">Cargar última medición</button>
+
   <table>
     <thead>
       <tr>
         <th>ID</th>
-        <th>Sensor</th>
+        <th>Sensor ID</th>
         <th>Valor</th>
         <th>Timestamp</th>
       </tr>
     </thead>
-    <tbody id="tabla-mediciones"></tbody>
+    <tbody id="tabla-mediciones">
+      <tr>
+        <td>--</td>
+        <td>--</td>
+        <td>--</td>
+        <td>--</td>
+      </tr>
+    </tbody>
   </table>
 
   <script>
-    async function cargarDatos() {
-      const response = await fetch("/api/medicion/1");
-      const datos = await response.json();
-      const tbody = document.getElementById("tabla-mediciones");
-      tbody.innerHTML = "";
-      datos.forEach(med => {
-        const fila = `
+    async function cargarUltima() {
+      try {
+        const res = await fetch("/api/mediciones/ultima");
+        if (!res.ok) throw new Error("Error cargando medición");
+        const data = await res.json();
+
+        const tbody = document.getElementById("tabla-mediciones");
+        tbody.innerHTML = `
           <tr>
-            <td>${med.id}</td>
-            <td>${med.sensorId}</td>
-            <td>${med.valor}</td>
-            <td>${med.timestamp}</td>
+            <td>${data.id || "--"}</td>
+            <td>${data.sensorId || "--"}</td>
+            <td>${data.valor || "--"}</td>
+            <td>${data.timestamp || "--"}</td>
           </tr>
         `;
-        tbody.innerHTML += fila;
-      });
+      } catch (err) {
+        alert(err.message);
+      }
     }
 
-    // cargar al iniciar
-    cargarDatos();
+    // Cargar al iniciar
+    cargarUltima();
   </script>
 </body>
 </html>
