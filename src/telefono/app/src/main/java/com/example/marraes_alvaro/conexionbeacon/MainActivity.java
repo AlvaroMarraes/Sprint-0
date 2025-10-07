@@ -3,6 +3,7 @@ package com.example.marraes_alvaro.conexionbeacon;
 // ------------------------------------------------------------------
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.le.BluetoothLeScanner;
@@ -27,7 +28,6 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    //PACHURU
     // --------------------------------------------------------------
     // --------------------------------------------------------------
     private static final String ETIQUETA_LOG = ">>>>";
@@ -40,8 +40,9 @@ public class MainActivity extends AppCompatActivity {
 
     private ScanCallback callbackDelEscaneo = null;
 
-    // --------------------------------------------------------------
-    // --------------------------------------------------------------
+    // ------------------------------------------------------------------
+    // Método que busca todos los dispositivos Bluetooth LE disponibles
+    // ------------------------------------------------------------------
     private void buscarTodosLosDispositivosBTLE() {
         Log.d(ETIQUETA_LOG, " buscarTodosLosDispositivosBTL(): empieza ");
 
@@ -81,9 +82,9 @@ public class MainActivity extends AppCompatActivity {
         }
     } // ()
 
-    // --------------------------------------------------------------
-    //posible cambio de nombre
-    // --------------------------------------------------------------
+    // ------------------------------------------------------------------
+    // Muestra la información detallada de un dispositivo BTLE detectado
+    // ------------------------------------------------------------------
     private void mostrarInformacionDispositivoBTLE( ScanResult resultado ) {
 
         BluetoothDevice bluetoothDevice = resultado.getDevice();
@@ -136,8 +137,9 @@ public class MainActivity extends AppCompatActivity {
 
     } // ()
 
-    // --------------------------------------------------------------
-    // --------------------------------------------------------------
+    // ------------------------------------------------------------------
+    // Busca un dispositivo Bluetooth LE específico por su nombre
+    // ------------------------------------------------------------------
     private void buscarEsteDispositivoBTLE(final String dispositivoBuscado ) {
         Log.d(ETIQUETA_LOG, " buscarEsteDispositivoBTLE(): empieza ");
 
@@ -145,6 +147,7 @@ public class MainActivity extends AppCompatActivity {
         // super.onScanResult(ScanSettings.SCAN_MODE_LOW_LATENCY, result); para ahorro de energía
         this.callbackDelEscaneo = new ScanCallback() {
 
+            @SuppressLint("MissingPermission")
             @Override
             public void onScanResult(int callbackType, ScanResult resultado) {
                 super.onScanResult(callbackType, resultado);
@@ -195,8 +198,9 @@ public class MainActivity extends AppCompatActivity {
         }
     } // ()
 
-    // --------------------------------------------------------------
-    // --------------------------------------------------------------
+    // ------------------------------------------------------------------
+    // Detiene el escaneo de dispositivos BTLE
+    // -----------------------------------------------------------------
     private void detenerBusquedaDispositivosBTLE() {
 
         if ( this.callbackDelEscaneo == null ) {
@@ -213,8 +217,9 @@ public class MainActivity extends AppCompatActivity {
 
     } // ()
 
-    // --------------------------------------------------------------
-    // --------------------------------------------------------------
+    // ------------------------------------------------------------------
+    // Acción del botón para buscar todos los dispositivos BTLE
+    // ------------------------------------------------------------------
     public void botonBuscarDispositivosBTLEPulsado( View v ) {
         Log.d(ETIQUETA_LOG, " boton buscar dispositivos BTLE Pulsado" );
         this.buscarTodosLosDispositivosBTLE();
@@ -291,7 +296,9 @@ public class MainActivity extends AppCompatActivity {
 
         }
     } // ()
-
+    // ------------------------------------------------------------------
+    // Interpreta los datos recibidos de una medición del beacon
+    // ------------------------------------------------------------------
     private void interpretarMedicion(byte[] datos) {
         if (datos == null || datos.length < 3) return;
 
@@ -329,8 +336,9 @@ public class MainActivity extends AppCompatActivity {
 
     } // onCreate()
 
-    // --------------------------------------------------------------
-    // --------------------------------------------------------------
+    // ------------------------------------------------------------------
+    // Gestiona el resultado de las solicitudes de permisos
+    // ------------------------------------------------------------------
     public void onRequestPermissionsResult(int requestCode, String[] permissions,
                                            int[] grantResults) {
         super.onRequestPermissionsResult( requestCode, permissions, grantResults);
@@ -354,7 +362,9 @@ public class MainActivity extends AppCompatActivity {
         }
     } // ()
 
-    //funcion para pedir permisos antes de intentar hacer cualquier cosa
+    // ------------------------------------------------------------------
+    // Comprueba y solicita permisos Bluetooth según la versión de Android
+    // ------------------------------------------------------------------
     private void checkBluetoothPermissions() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             String[] permissions = {
