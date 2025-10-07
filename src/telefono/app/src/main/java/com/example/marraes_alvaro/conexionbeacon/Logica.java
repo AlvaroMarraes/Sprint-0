@@ -6,13 +6,12 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-<<<<<<< Updated upstream
+
 /**
  * Clase Logica: versión actualizada sin AsyncTask.
  * Envía y recibe datos del servidor REST.
  */
-=======
->>>>>>> Stashed changes
+
 public class Logica {
 
     private static final String TAG = ">>>>";
@@ -22,13 +21,13 @@ public class Logica {
         this.urlServidor = urlServidor; //
     }
 
-<<<<<<< Updated upstream
+
     /**
      * Envía una medición al servidor REST (POST /medicion)
      */
-=======
+
     // Envía una medición al servidor
->>>>>>> Stashed changes
+
     public void guardarMedicion(int sensorId, int valor, String timestamp) {
         try {
             JSONObject json = new JSONObject();
@@ -42,24 +41,24 @@ public class Logica {
         }
     }
 
-<<<<<<< Updated upstream
+
     /**
      * Obtiene la última medición de un sensor (GET /medicion/:id)
      */
-=======
+
     // Obtiene la última medición de un sensor
->>>>>>> Stashed changes
+
     public void obtenerMedicion(int sensorId) {
         hacerPeticionREST("GET", urlServidor + "/medicion/" + sensorId, null);
     }
 
-<<<<<<< Updated upstream
+
     /**
      * Método genérico para llamadas REST sin AsyncTask
      */
-=======
+
     // Método genérico para peticiones REST
->>>>>>> Stashed changes
+
     private void hacerPeticionREST(String metodo, String urlDestino, String cuerpo) {
         new Thread(() -> {
             int codigoRespuesta = -1;
