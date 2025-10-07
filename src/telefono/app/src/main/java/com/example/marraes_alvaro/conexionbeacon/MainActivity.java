@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
 
     // --------------------------------------------------------------
     // --------------------------------------------------------------
-    private static final String ETIQUETA_LOG = ">>>>";
+    private static final String ETIQUETA_LOG = ">>>>>";
 
     private static final int REQUEST_BLUETOOTH_PERMISSIONS  = 11223344;
 
