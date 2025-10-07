@@ -1,31 +1,34 @@
 package com.example.marraes_alvaro.conexionbeacon;
 
 import android.util.Log;
-
 import org.json.JSONObject;
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+<<<<<<< Updated upstream
 /**
  * Clase Logica: versión actualizada sin AsyncTask.
  * Envía y recibe datos del servidor REST.
  */
+=======
+>>>>>>> Stashed changes
 public class Logica {
 
     private static final String TAG = ">>>>";
     private final String urlServidor;
 
     public Logica(String urlServidor) {
-        this.urlServidor = urlServidor;
+        this.urlServidor = urlServidor; //
     }
 
+<<<<<<< Updated upstream
     /**
      * Envía una medición al servidor REST (POST /medicion)
      */
+=======
+    // Envía una medición al servidor
+>>>>>>> Stashed changes
     public void guardarMedicion(int sensorId, int valor, String timestamp) {
         try {
             JSONObject json = new JSONObject();
@@ -39,16 +42,24 @@ public class Logica {
         }
     }
 
+<<<<<<< Updated upstream
     /**
      * Obtiene la última medición de un sensor (GET /medicion/:id)
      */
+=======
+    // Obtiene la última medición de un sensor
+>>>>>>> Stashed changes
     public void obtenerMedicion(int sensorId) {
         hacerPeticionREST("GET", urlServidor + "/medicion/" + sensorId, null);
     }
 
+<<<<<<< Updated upstream
     /**
      * Método genérico para llamadas REST sin AsyncTask
      */
+=======
+    // Método genérico para peticiones REST
+>>>>>>> Stashed changes
     private void hacerPeticionREST(String metodo, String urlDestino, String cuerpo) {
         new Thread(() -> {
             int codigoRespuesta = -1;
@@ -57,14 +68,16 @@ public class Logica {
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod(metodo);
                 conn.setRequestProperty("Content-Type", "application/json; charset=utf-8");
+                conn.setConnectTimeout(5000);
+                conn.setReadTimeout(5000);
                 conn.setDoInput(true);
 
                 if (!metodo.equals("GET") && cuerpo != null) {
                     conn.setDoOutput(true);
-                    DataOutputStream dos = new DataOutputStream(conn.getOutputStream());
-                    dos.writeBytes(cuerpo);
-                    dos.flush();
-                    dos.close();
+                    try (DataOutputStream dos = new DataOutputStream(conn.getOutputStream())) {
+                        dos.writeBytes(cuerpo);
+                        dos.flush();
+                    }
                 }
 
                 codigoRespuesta = conn.getResponseCode();
@@ -76,17 +89,15 @@ public class Logica {
                 BufferedReader br = new BufferedReader(new InputStreamReader(is));
                 StringBuilder sb = new StringBuilder();
                 String linea;
-                while ((linea = br.readLine()) != null) {
-                    sb.append(linea);
-                }
+                while ((linea = br.readLine()) != null) sb.append(linea);
                 br.close();
                 conn.disconnect();
 
                 Log.d(TAG, "Respuesta (" + codigoRespuesta + "): " + sb);
 
             } catch (Exception e) {
-                Log.e(TAG, "Error en petición REST", e);
+                Log.e(TAG, "Error en petición REST (" + metodo + " " + urlDestino + "): " + e.getMessage(), e);
             }
-        }).start(); // <--- se ejecuta en un hilo aparte
+        }).start();
     }
 }

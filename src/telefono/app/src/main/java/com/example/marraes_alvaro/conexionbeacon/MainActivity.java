@@ -9,6 +9,7 @@ import android.bluetooth.le.BluetoothLeScanner;
 import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanFilter;
 import android.bluetooth.le.ScanResult;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -227,7 +228,7 @@ public class MainActivity extends AppCompatActivity {
 
         //this.buscarEsteDispositivoBTLE( "EPSG-GTI-PROY-3A" );
         //AQUI SE PONE EL NOMBRE DEL DISPOSITIVO QUE QUIERES BUSCAR
-        this.buscarEsteDispositivoBTLE( "Alvaro" );
+        this.buscarEsteDispositivoBTLE( "David" );
 
     } // ()
 
@@ -247,11 +248,17 @@ public class MainActivity extends AppCompatActivity {
 
         Log.d(ETIQUETA_LOG, " inicializarBlueTooth(): habilitamos adaptador BT ");
 
-        try {
-            bta.enable();
-        }catch (SecurityException e){
-            Log.e(ETIQUETA_LOG, "No tienes permisos suficientes para inicializar Bluetooth", e);
+        if (bta == null) {
+            Log.e(ETIQUETA_LOG, "Este dispositivo no soporta Bluetooth");
+            return;
         }
+
+        if (!bta.isEnabled()) {
+            Log.d(ETIQUETA_LOG, "Bluetooth no está habilitado, pidiendo permiso al usuario...");
+            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(enableBtIntent, 1);
+        }
+
 
         Log.d(ETIQUETA_LOG, " inicializarBlueTooth(): habilitado =  " + bta.isEnabled() );
 
@@ -292,7 +299,7 @@ public class MainActivity extends AppCompatActivity {
         int valor = ((datos[1] & 0xFF) << 8) | (datos[2] & 0xFF);
         String timestamp = String.valueOf(System.currentTimeMillis());
 
-        Logica logica = new Logica("https://amarare.upv.edu.es/medicion");
+        Logica logica = new Logica("https://amarare.upv.edu.es");
         logica.guardarMedicion(id, valor, timestamp);
 
         String tipoMedicion;
