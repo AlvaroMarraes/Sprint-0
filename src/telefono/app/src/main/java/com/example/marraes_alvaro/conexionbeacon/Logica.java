@@ -10,10 +10,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-/**
- * Clase Logica: versión actualizada sin AsyncTask.
- * Envía y recibe datos del servidor REST.
- */
+
 public class Logica {
 
     private static final String TAG = ">>>>";
@@ -23,9 +20,10 @@ public class Logica {
         this.urlServidor = urlServidor;
     }
 
-    /**
-     * Envía una medición al servidor REST (POST /medicion)
-     */
+    // -------------------------------------------------------------
+    // Envía una medición al servidor mediante POST /medicion
+    // Recibe: id del sensor, valor medido y timestamp
+    // -------------------------------------------------------------
     public void guardarMedicion(int sensorId, int valor, String timestamp) {
         try {
             JSONObject json = new JSONObject();
@@ -39,16 +37,18 @@ public class Logica {
         }
     }
 
-    /**
-     * Obtiene la última medición de un sensor (GET /medicion/:id)
-     */
+    // -------------------------------------------------------------
+    // Obtiene la última medición de un sensor (GET /medicion/:id)
+    // Recibe el id del sensor 11,12...
+    // -------------------------------------------------------------
     public void obtenerMedicion(int sensorId) {
         hacerPeticionREST("GET", urlServidor + "/medicion/" + sensorId, null);
     }
 
-    /**
-     * Método genérico para llamadas REST sin AsyncTask
-     */
+    // -------------------------------------------------------------
+    // Método genérico para realizar peticiones REST (GET o POST)
+    // Se ejecuta en un hilo separado para no bloquear la interfaz
+    // -------------------------------------------------------------
     private void hacerPeticionREST(String metodo, String urlDestino, String cuerpo) {
         new Thread(() -> {
             int codigoRespuesta = -1;
