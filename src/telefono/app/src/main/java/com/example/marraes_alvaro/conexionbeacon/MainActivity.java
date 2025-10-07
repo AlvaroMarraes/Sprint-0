@@ -286,36 +286,27 @@ public class MainActivity extends AppCompatActivity {
     } // ()
 
     private void interpretarMedicion(byte[] datos) {
-        if (datos == null || datos.length < 3) {
-            Log.d(ETIQUETA_LOG, "interpretarMedicion(): trama demasiado corta");
-            return;
-        }
+        if (datos == null || datos.length < 3) return;
 
         int id = datos[0] & 0xFF;
         int valor = ((datos[1] & 0xFF) << 8) | (datos[2] & 0xFF);
+        String timestamp = String.valueOf(System.currentTimeMillis());
+
+        Logica logica = new Logica("https://amarare.upv.edu.es/medicion");
+        logica.guardarMedicion(id, valor, timestamp);
 
         String tipoMedicion;
         switch (id) {
-            case 11:
-                tipoMedicion = "CO₂ (ppm)";
-                break;
-            case 12:
-                tipoMedicion = "Temperatura (ºC)";
-                break;
-            case 13:
-                tipoMedicion = "Ruido (dB)";
-                break;
-            default:
-                tipoMedicion = "Desconocido";
+            case 11: tipoMedicion = "CO₂"; break;
+            case 12: tipoMedicion = "Temperatura"; break;
+            case 13: tipoMedicion = "Ruido"; break;
+            default: tipoMedicion = "Desconocido";
         }
 
-        Log.d(ETIQUETA_LOG, " === MEDICIÓN RECIBIDA ===");
-        Log.d(ETIQUETA_LOG, " Tipo: " + tipoMedicion);
-        Log.d(ETIQUETA_LOG, " Valor: " + valor);
+        Log.d(">>>>", " === MEDICIÓN RECIBIDA ===");
+        Log.d(">>>>", " Tipo: " + tipoMedicion);
+        Log.d(">>>>", " Valor: " + valor);
     }
-
-
-
     // --------------------------------------------------------------
     // --------------------------------------------------------------
     @Override

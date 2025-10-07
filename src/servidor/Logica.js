@@ -3,18 +3,19 @@ class Logica {
     this.db = db;
   }
 
-  guardarMedicion(datos) {
-    return new Promise((resolve, reject) => {
-      const sql = "INSERT INTO mediciones (sensorId, valor, tiempo) VALUES (?, ?, ?)";
-      this.db.run(sql, [datos.sensorId, datos.valor, datos.tiempo], function (err) {
-        if (err) {
-          reject(err);
-        } else {
-          resolve({ ok: true, mensaje: "Medición guardada correctamente", id: this.lastID });
-        }
-      });
+guardarMedicion(datos) {
+  return new Promise((resolve, reject) => {
+    const sql = "INSERT INTO mediciones (sensorId, valor, timestamp) VALUES (?, ?, ?)";
+    this.db.run(sql, [datos.sensorId, datos.valor, datos.timestamp], function (err) {
+      if (err) {
+        reject(err);
+      } else {
+        resolve({ ok: true, mensaje: "Medición guardada correctamente", id: this.lastID });
+      }
     });
-  }
+  });
+}
+
 
   getMedicion(sensorId) {
     return new Promise((resolve, reject) => {
