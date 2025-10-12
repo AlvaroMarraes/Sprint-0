@@ -6,28 +6,26 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-
 /**
  * Clase Logica: versión actualizada sin AsyncTask.
  * Envía y recibe datos del servidor REST.
  */
-
 public class Logica {
 
     private static final String TAG = ">>>>";
-    private final String urlServidor;
-
-    public Logica(String urlServidor) {
-        this.urlServidor = urlServidor; //
-    }
-
+    private final String urlBase;
 
     /**
-     * Envía una medición al servidor REST (POST /medicion)
+     * @param urlServidor URL base del servidor REST, sin la ruta específica
+     *                   ejemplo: "https://amarare.upv.edu.es/api/mediciones"
      */
+    public Logica(String urlServidor) {
+        this.urlBase = urlServidor;
+    }
 
-    // Envía una medición al servidor
-
+    /**
+     * Envía una medición al servidor REST (POST /api/mediciones)
+     */
     public void guardarMedicion(int sensorId, int valor, String timestamp) {
         try {
             JSONObject json = new JSONObject();
@@ -35,30 +33,29 @@ public class Logica {
             json.put("valor", valor);
             json.put("timestamp", timestamp);
 
-            hacerPeticionREST("POST", urlServidor + "/medicion", json.toString());
+            hacerPeticionREST("POST", urlBase, json.toString());
         } catch (Exception e) {
             Log.e(TAG, "Error creando JSON", e);
         }
     }
 
-
     /**
-     * Obtiene la última medición de un sensor (GET /medicion/:id)
+     * Obtiene la última medición de un sensor (GET /api/mediciones/:sensorId)
      */
-
-    // Obtiene la última medición de un sensor
-
     public void obtenerMedicion(int sensorId) {
-        hacerPeticionREST("GET", urlServidor + "/medicion/" + sensorId, null);
+        hacerPeticionREST("GET", urlBase + "/" + sensorId, null);
     }
 
+    /**
+     * Obtiene la última medición global (GET /api/mediciones/ultima)
+     */
+    public void obtenerUltimaMedicionGlobal() {
+        hacerPeticionREST("GET", urlBase + "/ultima", null);
+    }
 
     /**
      * Método genérico para llamadas REST sin AsyncTask
      */
-
-    // Método genérico para peticiones REST
-
     private void hacerPeticionREST(String metodo, String urlDestino, String cuerpo) {
         new Thread(() -> {
             int codigoRespuesta = -1;

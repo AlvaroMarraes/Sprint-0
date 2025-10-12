@@ -292,21 +292,22 @@ public class MainActivity extends AppCompatActivity {
 
         String timestamp = String.valueOf(System.currentTimeMillis());
 
-        Logica logica = new Logica("https://amarare.upv.edu.es");
+        Logica logica = new Logica("https://amarare.upv.edu.es/api/mediciones");
         logica.guardarMedicion(id, valor, timestamp);
 
         String tipoMedicion;
         switch (id) {
-            case 11: tipoMedicion = "CO₂"; break;
+            case 11: tipoMedicion = "CO2"; break;
             case 12: tipoMedicion = "Temperatura"; break;
             case 13: tipoMedicion = "Ruido"; break;
             default: tipoMedicion = "Desconocido";
         }
-
         Log.d(">>>>", " === MEDICIÓN RECIBIDA ===");
         Log.d(">>>>", " Tipo: " + tipoMedicion);
         Log.d(">>>>", " Valor: " + valor);
         Log.d(">>>>", " Contador: " + contador);
+        Log.d(">>>>", " Major: " + major);
+        Log.d(">>>>", " Minor: " + minor);
     }
 
     // --------------------------------------------------------------
