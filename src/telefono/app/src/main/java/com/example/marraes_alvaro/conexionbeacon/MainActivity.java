@@ -103,13 +103,6 @@ public class MainActivity extends AppCompatActivity {
 
         Log.d(ETIQUETA_LOG, " toString = " + bluetoothDevice.toString());
 
-        /*
-        ParcelUuid[] puuids = bluetoothDevice.getUuids();
-        if ( puuids.length >= 1 ) {
-            //Log.d(ETIQUETA_LOG, " uuid = " + puuids[0].getUuid());
-           // Log.d(ETIQUETA_LOG, " uuid = " + puuids[0].toString());
-        }*/
-
         Log.d(ETIQUETA_LOG, " dirección = " + bluetoothDevice.getAddress());
         Log.d(ETIQUETA_LOG, " rssi = " + rssi );
 
@@ -144,7 +137,6 @@ public class MainActivity extends AppCompatActivity {
         Log.d(ETIQUETA_LOG, " buscarEsteDispositivoBTLE(): empieza ");
 
         Log.d(ETIQUETA_LOG, "  buscarEsteDispositivoBTLE(): instalamos scan callback ");
-        // super.onScanResult(ScanSettings.SCAN_MODE_LOW_LATENCY, result); para ahorro de energía
         this.callbackDelEscaneo = new ScanCallback() {
 
             @SuppressLint("MissingPermission")
@@ -153,21 +145,18 @@ public class MainActivity extends AppCompatActivity {
                 super.onScanResult(callbackType, resultado);
 
                 BluetoothDevice device = resultado.getDevice();
-                if (device.getName() != null && device.getName().equals("Alvaro")) {
+                // ✅ CAMBIO: ahora se usa el parámetro dispositivoBuscado en lugar de "Alvaro"
+                if (device.getName() != null && device.getName().equals(dispositivoBuscado)) {
                     Log.d(ETIQUETA_LOG, "¡¡ Encontrado beacon buscado !!");
 
-                    // Sacar manufacturer data
-                    byte[] manufacturerData = null;
-                    if (resultado.getScanRecord() != null &&
-                            resultado.getScanRecord().getManufacturerSpecificData() != null &&
-                            resultado.getScanRecord().getManufacturerSpecificData().size() > 0) {
-
-                        manufacturerData = resultado.getScanRecord()
-                                .getManufacturerSpecificData()
-                                .valueAt(0); // primer bloque
+                    // Sacar trama completa del beacon
+                    if (resultado.getScanRecord() != null) {
+                        byte[] datos = resultado.getScanRecord().getBytes();
+                        Log.d(ETIQUETA_LOG, "Trama completa recibida (" + datos.length + " bytes)");
+                        interpretarMedicion(datos);
+                    } else {
+                        Log.d(ETIQUETA_LOG, "ScanRecord nulo, no se puede interpretar la medición");
                     }
-
-                    interpretarMedicion(manufacturerData);
                 }
             }
 
@@ -175,7 +164,6 @@ public class MainActivity extends AppCompatActivity {
             public void onBatchScanResults(List<ScanResult> results) {
                 super.onBatchScanResults(results);
                 Log.d(ETIQUETA_LOG, "  buscarEsteDispositivoBTLE(): onBatchScanResults() ");
-
             }
 
             @Override
@@ -188,8 +176,6 @@ public class MainActivity extends AppCompatActivity {
         ScanFilter sf = new ScanFilter.Builder().setDeviceName( dispositivoBuscado ).build();
 
         Log.d(ETIQUETA_LOG, "  buscarEsteDispositivoBTLE(): empezamos a escanear buscando: " + dispositivoBuscado );
-        //Log.d(ETIQUETA_LOG, "  buscarEsteDispositivoBTLE(): empezamos a escanear buscando: " + dispositivoBuscado
-        //      + " -> " + Utilidades.stringToUUID( dispositivoBuscado ) );
 
         try {
             this.elEscanner.startScan( this.callbackDelEscaneo );
@@ -229,12 +215,7 @@ public class MainActivity extends AppCompatActivity {
     // --------------------------------------------------------------
     public void botonBuscarNuestroDispositivoBTLEPulsado( View v ) {
         Log.d(ETIQUETA_LOG, " boton nuestro dispositivo BTLE Pulsado" );
-        //this.buscarEsteDispositivoBTLE( Utilidades.stringToUUID( "EPSG-GTI-PROY-3A" ) );
-
-        //this.buscarEsteDispositivoBTLE( "EPSG-GTI-PROY-3A" );
-        //AQUI SE PONE EL NOMBRE DEL DISPOSITIVO QUE QUIERES BUSCAR
-        this.buscarEsteDispositivoBTLE( "David" );
-
+        this.buscarEsteDispositivoBTLE( "Alvaro" );
     } // ()
 
     // --------------------------------------------------------------
@@ -264,9 +245,7 @@ public class MainActivity extends AppCompatActivity {
             startActivityForResult(enableBtIntent, 1);
         }
 
-
         Log.d(ETIQUETA_LOG, " inicializarBlueTooth(): habilitado =  " + bta.isEnabled() );
-
         Log.d(ETIQUETA_LOG, " inicializarBlueTooth(): estado =  " + bta.getState() );
 
         Log.d(ETIQUETA_LOG, " inicializarBlueTooth(): obtenemos escaner btle ");
@@ -275,7 +254,6 @@ public class MainActivity extends AppCompatActivity {
 
         if ( this.elEscanner == null ) {
             Log.d(ETIQUETA_LOG, " inicializarBlueTooth(): Socorro: NO hemos obtenido escaner btle  !!!!");
-
         }
 
         Log.d(ETIQUETA_LOG, " inicializarBlueTooth(): voy a perdir permisos (si no los tuviera) !!!!");
@@ -293,17 +271,25 @@ public class MainActivity extends AppCompatActivity {
         }
         else {
             Log.d(ETIQUETA_LOG, " inicializarBlueTooth(): parece que YA tengo los permisos necesarios !!!!");
-
         }
     } // ()
+
     // ------------------------------------------------------------------
     // Interpreta los datos recibidos de una medición del beacon
     // ------------------------------------------------------------------
     private void interpretarMedicion(byte[] datos) {
-        if (datos == null || datos.length < 3) return;
+        if (datos == null || datos.length < 29) return; // mínimo 29 bytes
 
-        int id = datos[0] & 0xFF;
-        int valor = ((datos[1] & 0xFF) << 8) | (datos[2] & 0xFF);
+        // Extraemos major y minor de la trama
+        int major = ((datos[25] & 0xFF) << 8) | (datos[26] & 0xFF);
+        int minor = ((datos[27] & 0xFF) << 8) | (datos[28] & 0xFF);
+
+        // Descomponemos major: bits altos = ID sensor, bits bajos = contador
+        int id = (major >> 8) & 0xFF;
+        int contador = major & 0xFF;
+
+        int valor = minor; // valor medido enviado como 'minor'
+
         String timestamp = String.valueOf(System.currentTimeMillis());
 
         Logica logica = new Logica("https://amarare.upv.edu.es");
@@ -320,7 +306,9 @@ public class MainActivity extends AppCompatActivity {
         Log.d(">>>>", " === MEDICIÓN RECIBIDA ===");
         Log.d(">>>>", " Tipo: " + tipoMedicion);
         Log.d(">>>>", " Valor: " + valor);
+        Log.d(">>>>", " Contador: " + contador);
     }
+
     // --------------------------------------------------------------
     // --------------------------------------------------------------
     @Override
@@ -333,7 +321,6 @@ public class MainActivity extends AppCompatActivity {
         checkBluetoothPermissions();
 
         Log.d(ETIQUETA_LOG, " onCreate(): termina ");
-
     } // onCreate()
 
     // ------------------------------------------------------------------
@@ -345,18 +332,13 @@ public class MainActivity extends AppCompatActivity {
 
         switch (requestCode) {
             case REQUEST_BLUETOOTH_PERMISSIONS:
-                // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0 &&
                         grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
                     Log.d(ETIQUETA_LOG, " onRequestPermissionResult(): permisos concedidos  !!!!");
                     inicializarBlueTooth();
-                    // Permission is granted. Continue the action or workflow
-                    // in your app.
                 }  else {
-
                     Log.d(ETIQUETA_LOG, " onRequestPermissionResult(): Socorro: permisos NO concedidos  !!!!");
-
                 }
                 return;
         }
@@ -387,7 +369,6 @@ public class MainActivity extends AppCompatActivity {
                         REQUEST_BLUETOOTH_PERMISSIONS
                 );
             } else {
-                //  Ya tenemos permisos, inicializamos el Bluetooth
                 inicializarBlueTooth();
             }
         } else {
@@ -399,7 +380,6 @@ public class MainActivity extends AppCompatActivity {
                         REQUEST_BLUETOOTH_PERMISSIONS
                 );
             } else {
-                //  Ya tenemos permisos, inicializamos el Bluetooth
                 inicializarBlueTooth();
             }
         }

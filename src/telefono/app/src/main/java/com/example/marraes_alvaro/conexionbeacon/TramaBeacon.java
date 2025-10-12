@@ -93,8 +93,8 @@ public class TramaBeacon {
 
         prefijo = Arrays.copyOfRange(losBytes, 0, 8+1 ); // 9 bytes
         uuid = Arrays.copyOfRange(losBytes, 9, 24+1 ); // 16 bytes
-        major = Arrays.copyOfRange(losBytes, 25, 26+1 ); // 2 bytes
-        minor = Arrays.copyOfRange(losBytes, 27, 28+1 ); // 2 bytes
+        major = Arrays.copyOfRange(losBytes, 25, 27); // 2 bytes
+        minor = Arrays.copyOfRange(losBytes, 27, 29); // 2 bytes
         txPower = losBytes[ 29 ]; // 1 byte
 
         advFlags = Arrays.copyOfRange( prefijo, 0, 2+1 ); // 3 bytes

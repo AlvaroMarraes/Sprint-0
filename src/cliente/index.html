@@ -39,7 +39,7 @@
   <script>
     async function cargarUltima() {
       try {
-        const res = await fetch("/api/medicion");
+        const res = await fetch("/api/medicion/1");
         if (!res.ok) throw new Error("Error cargando medición");
         const data = await res.json();
 
