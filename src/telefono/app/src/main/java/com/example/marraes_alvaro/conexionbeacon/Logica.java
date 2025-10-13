@@ -6,26 +6,20 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-/**
- * Clase Logica: versión actualizada sin AsyncTask.
- * Envía y recibe datos del servidor REST.
- */
+
+ //Clase Logica:Envía y recibe datos del servidor REST.
 public class Logica {
 
     private static final String TAG = ">>>>";
     private final String urlBase;
 
-    /**
-     * @param urlServidor URL base del servidor REST, sin la ruta específica
-     *                   ejemplo: "https://amarare.upv.edu.es/api/mediciones"
-     */
+     //Constructor de la clase Logica.
     public Logica(String urlServidor) {
         this.urlBase = urlServidor;
     }
 
-    /**
-     * Envía una medición al servidor REST (POST /api/mediciones)
-     */
+
+     //Envía una medición al servidor REST (POST /api/mediciones)
     public void guardarMedicion(int sensorId, int valor, String timestamp) {
         try {
             JSONObject json = new JSONObject();
@@ -39,9 +33,7 @@ public class Logica {
         }
     }
 
-    /**
-     * Método genérico para llamadas REST sin AsyncTask
-     */
+    //Método genérico para llamadas REST
     private void hacerPeticionREST(String metodo, String urlDestino, String cuerpo) {
         new Thread(() -> {
             int codigoRespuesta = -1;
