@@ -11,7 +11,7 @@ async function testAPI() {
       valor: 555
     };
 
-    let res = await fetch("http://https://amarare.upv.edu.es//v1api/mediciones", {
+    let res = await fetch("http://localhost:3000/api/mediciones", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(nuevaMedicion)
@@ -22,7 +22,7 @@ async function testAPI() {
     console.log("POST respuesta:", postData);
 
     //Obtener la última medición
-    res = await fetch("http://https://amarare.upv.edu.es//v1api/mediciones/ultima");
+    res = await fetch("http://localhost:3000/api/mediciones/ultima");
     const ultima = await res.json();
 
     console.log("GET status:", res.status);
