@@ -293,7 +293,7 @@ public class MainActivity extends AppCompatActivity {
         String timestamp = String.valueOf(System.currentTimeMillis());
 
         Logica logica = new Logica("https://amarare.upv.edu.es/api/mediciones");
-        logica.guardarMedicion(id, valor, timestamp);
+        logica.guardarMedicion(id, valor, timestamp); 
 
         String tipoMedicion;
         switch (id) {
