@@ -38,21 +38,7 @@ public class Logica {
             Log.e(TAG, "Error creando JSON", e);
         }
     }
-
-    /**
-     * Obtiene la última medición de un sensor (GET /api/mediciones/:sensorId)
-     */
-    public void obtenerMedicion(int sensorId) {
-        hacerPeticionREST("GET", urlBase + "/" + sensorId, null);
-    }
-
-    /**
-     * Obtiene la última medición global (GET /api/mediciones/ultima)
-     */
-    public void obtenerUltimaMedicionGlobal() {
-        hacerPeticionREST("GET", urlBase + "/ultima", null);
-    }
-
+    
     /**
      * Método genérico para llamadas REST sin AsyncTask
      */
