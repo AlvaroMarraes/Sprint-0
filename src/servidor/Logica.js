@@ -40,7 +40,7 @@ class Logica {
     });
   }
 
-  // Obtener la última medición global (opcional)
+  // Obtener la última medición
   obtenerUltimaMedicion() {
     return new Promise((resolve, reject) => {
       this.db.get(

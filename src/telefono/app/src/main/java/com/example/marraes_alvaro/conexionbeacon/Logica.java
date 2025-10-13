@@ -38,7 +38,7 @@ public class Logica {
             Log.e(TAG, "Error creando JSON", e);
         }
     }
-    
+
     /**
      * Método genérico para llamadas REST sin AsyncTask
      */
